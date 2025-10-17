@@ -1,13 +1,5 @@
 ﻿using Raylib_cs;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Numerics;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace tetris
 {
     internal class Tetris 
@@ -23,7 +15,6 @@ namespace tetris
             {
                 Render();
             }
-
             Raylib.WindowShouldClose();
         }
 
@@ -80,28 +71,32 @@ namespace tetris
                 bool isVisible2 = true;
                 bool isVisible3 = true;
                 bool isVisible4 = true;
+                bool isActive = true;
                 Vector2 pos = new Vector2(0, 0);
                 Vector2 pos2 = new Vector2(pos.X, pos.Y + pixel);
                 Vector2 pos3 = new Vector2(pos.X, pos2.Y + pixel);
                 Vector2 pos4 = new Vector2(pos.X + pixel, pos3.Y);
-               TetroHold.Add(new TetroManager(color,pos,isVisible1));
-               TetroHold.Add(new TetroManager(color,pos2,isVisible2));
-               TetroHold.Add(new TetroManager(color,pos3,isVisible3));
+               TetroHold.Add(new TetroManager(color,pos,isVisible1,isActive));
+               TetroHold.Add(new TetroManager(color,pos2,isVisible2,isActive));
+               TetroHold.Add(new TetroManager(color,pos3,isVisible3,isActive));
+               TetroHold.Add(new TetroManager(color,pos4,isVisible4,isActive));
             }
         }
 
         public struct TetroManager
         {
-            public TetroManager(Color color,Vector2 position,bool isVisible)
+            public TetroManager(Color color,Vector2 position,bool isVisible, bool isActive)
             {
                 Color = color;
                 Position = position;
                 IsVisible = isVisible;
+                IsActive = isActive;
             }
 
             public Color Color{get;}
             public Vector2 Position { get; }
             public bool IsVisible { get; }
+            public bool IsActive { get; }
         }
     }
 }
