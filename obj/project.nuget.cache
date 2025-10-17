@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "dxklo5ibNeA=",
+  "success": true,
+  "projectFilePath": "G:\\repos\\tetris\\tetris.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Acer\\.nuget\\packages\\raylib-cs\\7.0.1\\raylib-cs.7.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}
