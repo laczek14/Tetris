@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Raylib_cs;
 using System.Numerics;
 
@@ -103,29 +103,28 @@ namespace tetris
                 Color = color;
                 Position = position;
                 IsVisible = isVisible;
+                IsActive = false;
             }
 
-
-
             public Color Color { get; }
-            public Vector2 Position { get; }
+            public Vector2 Position { get; set; }
             public bool IsVisible { get; }
             public bool IsActive { get; }
         }
 
         void Movement()
         {
-            foreach (var var in TetroHold)
+            for (int i = 0; i < TetroHold.Count; i++)
             {
-                switch (var.IsActive)
+                var tetro = TetroHold[i];
+                if (tetro.IsActive)
                 {
-                    case true:
-                        if (Raylib.IsKeyPressed(KeyboardKey.D) & var.Position.X > -0)
-                        {
-                            var.Position.X + pixel * Raylib.GetFrameTime();
-                        }
-
-                        break;
+                    if (Raylib.IsKeyPressed(KeyboardKey.D) && tetro.Position.X > 0)
+                    {
+                        Vector2 newPosition = new Vector2(tetro.Position.X + pixel * Raylib.GetFrameTime(), tetro.Position.Y);
+                        tetro = new TetroManager(tetro.Color, newPosition, tetro.IsVisible, tetro.IsActive);
+                        TetroHold[i] = tetro;
+                    }
                 }
             }
         }
