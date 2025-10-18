@@ -1,4 +1,4 @@
-﻿using Raylib_cs;
+using Raylib_cs;
 using System.Numerics;
 namespace tetris
 {
@@ -21,12 +21,12 @@ namespace tetris
         void Render() 
         {
             Raylib.BeginDrawing();
+            Raylib.ClearBackground(Color.White);
             Grid();
             foreach (TetroManager tetroholds in TetroHold)
             {
                 Pixel(tetroholds);   
             }
-            Raylib.ClearBackground(Color.White);
             Raylib.EndDrawing();
         }
 
