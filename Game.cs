@@ -6,18 +6,17 @@ namespace tetris
 {
     internal class Tetris
     {
-        public const int Width = 480;
-        public const int Height = 480;
-        public int pixel = 40;
-        public List<TetroManager> TetroHold = new List<TetroManager>();
-
-        public void Start()
+    public const int Width = 480;
+    public const int Height = 480;
+    public float pixel = 40f;
+    public List<TetroManager> TetroHold = new List<TetroManager>();
+    public void Start()
+    {
+        Raylib.InitWindow(Width, Height, "tetris");
+        while (!Raylib.WindowShouldClose())
         {
-            Raylib.InitWindow(Width, Height, "tetris");
-            while (!Raylib.WindowShouldClose())
-            {
-                Render();
-            }
+            Render();
+        }
 
             Raylib.WindowShouldClose();
         }
