@@ -1,34 +1,35 @@
 ﻿using System.Diagnostics;
 using Raylib_cs;
 using System.Numerics;
-
+using System.Timers;
 namespace tetris
 {
     internal class Tetris 
 
     {
-    public const int Width = 480;
-    public const int Height = 480;
-    public float pixel = 40f;
-    public List<TetroManager> TetroHold = new List<TetroManager>();
+     const int Width = 480;
+     const int Height = 480;
+     private float pixel = 40f;
+     List<TetroManager> TetroHold = new List<TetroManager>();
+     int times;
     public void Start()
     {
         Raylib.InitWindow(Width, Height, "tetris");
+        Tetrominoes("l");
         while (!Raylib.WindowShouldClose())
         {
-            Movement();
+            Update();
             Render();
         }
-
         Raylib.WindowShouldClose();
     }
 
     void Render()
     {
+        Raylib.SetTargetFPS(60);
         Raylib.BeginDrawing();
         Raylib.ClearBackground(Color.White);
         Grid();
-        Tetrominoes("l");
         foreach (TetroManager tetroholds in TetroHold)
         {
             Pixel(tetroholds);
@@ -36,7 +37,7 @@ namespace tetris
         Raylib.EndDrawing();
     }
 
-    void Pixel(TetroManager TetroManager = new TetroManager())
+    void Pixel(TetroManager TetroManager)
     {
         Color Color = TetroManager.Color;
         Vector2 Position = new Vector2(TetroManager.Position.X, TetroManager.Position.Y);
@@ -82,14 +83,14 @@ namespace tetris
             Vector2 pos2 = new Vector2(pos.X, pos.Y + pixel);
             Vector2 pos3 = new Vector2(pos.X, pos2.Y + pixel);
             Vector2 pos4 = new Vector2(pos.X + pixel, pos3.Y);
-            TetroHold.Add(new TetroManager(color, pos, isVisible1, isActive));
-            TetroHold.Add(new TetroManager(color, pos2, isVisible2));
-            TetroHold.Add(new TetroManager(color, pos3, isVisible3));
-            TetroHold.Add(new TetroManager(color, pos4, isVisible4));
+            TetroHold.Add(new TetroManager(color, pos, isVisible1,isActive));
+            TetroHold.Add(new TetroManager(color, pos2, isVisible2,isActive));
+            TetroHold.Add(new TetroManager(color, pos3, isVisible3,isActive));
+            TetroHold.Add(new TetroManager(color, pos4, isVisible4,isActive));
         }
     }
 
-    public struct TetroManager
+    public class TetroManager
     {
         public TetroManager(Color color, Vector2 position, bool isVisible, bool isActive)
         {
@@ -98,37 +99,51 @@ namespace tetris
             IsVisible = isVisible;
             IsActive = isActive;
         }
-
-        public TetroManager(Color color, Vector2 position, bool isVisible)
-        {
-            Color = color;
-            Position = position;
-            IsVisible = isVisible;
-        }
-
-
-
+        
+        
         public Color Color { get; }
         public Vector2 Position { get; set; }
         public bool IsVisible { get; set; }
         public bool IsActive { get; set; }
     }
-
-
-    void Movement() 
+    //problem with implementing a timer 
+    void Update() 
     {
         for (int i = 0; i < TetroHold.Count; i++)
         {
-            TetroManager Tetro = TetroHold[i];
-            switch (Tetro.IsActive)
+            System.Timers.Timer timer;
+            var tetro = TetroHold[i];
+            switch (tetro.IsActive)
             {
                 case true:
-                    if (Raylib.IsKeyPressed(KeyboardKey.D))
-                    {
-                        Vector2 P = new Vector2(Tetro.Position.X + pixel, Tetro.Position.Y);
-                        Tetro.Position = P;
-                    }
-                    break;
+                        timer = new System.Timers.Timer(2000);
+                        timer.AutoReset = false;
+                        timer.Enabled = true;
+                        timer.Elapsed += Move;
+                        
+                //Movement
+                void Move(Object source, ElapsedEventArgs e)
+                {
+                    float Y = tetro.Position.Y;
+                    Y += pixel;
+                    tetro.Position = new Vector2(tetro.Position.X, Y);
+                    times++;
+                }
+
+                if (Raylib.IsKeyPressed(KeyboardKey.D))
+                {
+                    float X = tetro.Position.X;
+                    X += pixel;
+                    tetro.Position = new Vector2(X, tetro.Position.Y);
+                }
+
+                if (Raylib.IsKeyPressed(KeyboardKey.A))
+                {
+                    float X = tetro.Position.X;
+                    X -= pixel;
+                    tetro.Position = new Vector2(X, tetro.Position.Y);
+                }
+                break;
             }
         }
     }

@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/home/laczek/Documents/repos/tetris/tetris.csproj": {}
+    "C:\\Users\\User\\RiderProjects\\Tetris\\tetris.csproj": {}
   },
   "projects": {
-    "/home/laczek/Documents/repos/tetris/tetris.csproj": {
+    "C:\\Users\\User\\RiderProjects\\Tetris\\tetris.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/laczek/Documents/repos/tetris/tetris.csproj",
+        "projectUniqueName": "C:\\Users\\User\\RiderProjects\\Tetris\\tetris.csproj",
         "projectName": "tetris",
-        "projectPath": "/home/laczek/Documents/repos/tetris/tetris.csproj",
-        "packagesPath": "/home/laczek/.nuget/packages/",
-        "outputPath": "/home/laczek/Documents/repos/tetris/obj/",
+        "projectPath": "C:\\Users\\User\\RiderProjects\\Tetris\\tetris.csproj",
+        "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\User\\RiderProjects\\Tetris\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/laczek/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -37,8 +37,7 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "10.0.100"
+        }
       },
       "frameworks": {
         "net8.0": {
@@ -60,26 +59,12 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.22, 8.0.22]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Host.linux-x64",
-              "version": "[8.0.22, 8.0.22]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.22, 8.0.22]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/home/laczek/.dotnet/sdk/10.0.100/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.417/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
