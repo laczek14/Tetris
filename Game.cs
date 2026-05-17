@@ -12,6 +12,8 @@ namespace tetris
      private float pixel = 40f;
      List<TetroManager> TetroHold = new List<TetroManager>();
      int times;
+     int speed = 10;
+     bool land = false;
     public void Start()
     {
         Raylib.InitWindow(Width, Height, "tetris");
@@ -46,6 +48,16 @@ namespace tetris
         Raylib.DrawRectangleV(Position, V, Color);
     }
 
+    void Debug()
+    {
+        for (int i = 0; i < TetroHold.Count; i++)
+        {
+            var tetro = TetroHold[i];
+            Vector2 pos = tetro.Position;
+            Raylib.DrawText(pos.Y.ToString(),100,0,60,Color.Black);
+        }
+    }
+    
     void Grid()
     {
         for (Vector2 V = new Vector2(0, 0); V.X <= Width; V.X += pixel)
@@ -116,18 +128,40 @@ namespace tetris
             switch (tetro.IsActive)
             {
                 case true:
+                    
                         timer = new System.Timers.Timer(2000);
                         timer.AutoReset = false;
                         timer.Enabled = true;
                         timer.Elapsed += Move;
                         
+                        //landing detection
+                        for (int i2 = 0; i2 < TetroHold.Count; i2++)
+                        {
+                            var tetromino = TetroHold[i2];
+                            float landingPos = Height - pixel;
+                            if (land == true)
+                            {
+                                tetromino.IsActive = false;
+                            }
+                            if (tetromino.IsActive)
+                            {
+                                if (tetromino.Position.Y == landingPos)
+                                {
+                                    land = true;
+                                }
+                            }
+                        }
+                        
                 //Movement
                 void Move(Object source, ElapsedEventArgs e)
                 {
-                    float Y = tetro.Position.Y;
-                    Y += pixel;
-                    tetro.Position = new Vector2(tetro.Position.X, Y);
-                    times++;
+                    if (land == false)
+                    {
+                        float Y = tetro.Position.Y;
+                        Y += pixel/speed;
+                        tetro.Position = new Vector2(tetro.Position.X, Y);
+                        times++;
+                    }
                 }
 
                 if (Raylib.IsKeyPressed(KeyboardKey.D))
@@ -142,6 +176,11 @@ namespace tetris
                     float X = tetro.Position.X;
                     X -= pixel;
                     tetro.Position = new Vector2(X, tetro.Position.Y);
+                }
+
+                if (Raylib.IsKeyPressed(KeyboardKey.S))
+                {
+                    Vector2 position = new  Vector2(tetro.Position.X, tetro.Position.Y);
                 }
                 break;
             }
