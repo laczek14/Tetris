@@ -1,4 +1,5 @@
 ﻿
+using System.ComponentModel.DataAnnotations;
 using Raylib_cs;
 using System.Numerics;
 using System.Timers;
@@ -7,76 +8,120 @@ namespace tetris
     internal class Tetris
     {
         private const int Width = 480;
-     private const int Height = 480;
-     private float pixel = 40f;
-     private List<TetroManager> TetroHold = new List<TetroManager>();
-     private int times;
-     private int speed = 50;
-     private int boost;
-     private bool land = false;
-     private bool debug = false;
-    public void Start()
-    {
-        Raylib.InitWindow(Width, Height, "tetris");
-        Tetrominoes("X");
-        while (!Raylib.WindowShouldClose())
+        private const int Height = 480;
+        private float pixel = 40f;
+        private List<TetroManager> TetroHold = new List<TetroManager>();
+        private int times;
+        private float speed = 50f;
+        private int boost;
+        private bool land = false;
+        private bool debugMostLeft = false;
+        private bool debugMostRight = false;
+        private float mostRightX = 0f;
+
+        public void Start()
         {
-            Update();
-            Render();
-            if (debug == true)
+            Raylib.InitWindow(Width, Height, "tetris");
+            Tetrominoes("X");
+            while (!Raylib.WindowShouldClose())
             {
-              Debug();  
+                Update();
+                Render();
+                switch (debugMostLeft)
+                {
+                    case true:
+                        DebugMostLeft();
+                        break;
+                }
+
+                switch (debugMostRight)
+                {
+                    case true:
+                        DebugMostRight();
+                        break;
+                }
+            }
+
+            Raylib.WindowShouldClose();
+        }
+
+        void Render()
+        {
+            Raylib.SetTargetFPS(60);
+            Raylib.BeginDrawing();
+            Raylib.ClearBackground(Color.White);
+            Grid();
+            foreach (TetroManager tetroholds in TetroHold)
+            {
+                Pixel(tetroholds);
+            }
+
+            Raylib.EndDrawing();
+        }
+
+        void Pixel(TetroManager TetroManager)
+        {
+            Color Color = TetroManager.Color;
+            Vector2 Position = new Vector2(TetroManager.Position.X, TetroManager.Position.Y);
+            bool IsVisible = TetroManager.IsVisible;
+            Vector2 V = new Vector2(pixel, pixel);
+            Raylib.DrawRectangleV(Position, V, Color);
+        }
+
+        void DebugMostLeft()
+        {
+            for (int i = 0; i < TetroHold.Count; i++)
+            {
+                var tetro = TetroHold[i];
+                switch (tetro.IsActive)
+                {
+                    case true:
+                        switch (tetro.MostLeft)
+                        {
+                            case true:
+                                float x = tetro.Position.X;
+                                Raylib.DrawText(x.ToString(), 100, 0, 60, Color.Black);
+                                break;
+                        }
+                        break;
+                }
             }
         }
-        Raylib.WindowShouldClose();
-    }
 
-    void Render()
-    {
-        Raylib.SetTargetFPS(60);
-        Raylib.BeginDrawing();
-        Raylib.ClearBackground(Color.White);
-        Grid();
-        foreach (TetroManager tetroholds in TetroHold)
+        void DebugMostRight()
         {
-            Pixel(tetroholds);
-        }
-        Raylib.EndDrawing();
-    }
-
-    void Pixel(TetroManager TetroManager)
-    {
-        Color Color = TetroManager.Color;
-        Vector2 Position = new Vector2(TetroManager.Position.X, TetroManager.Position.Y);
-        bool IsVisible = TetroManager.IsVisible;
-        Vector2 V = new Vector2(pixel, pixel);
-        Raylib.DrawRectangleV(Position, V, Color);
-    }
-
-    void Debug()
-    {
-        for (int i = 0; i < TetroHold.Count; i++)
-        {
-            var tetro = TetroHold[i];
-            Vector2 pos = tetro.Position;
-            Raylib.DrawText(pos.Y.ToString(),100,0,60,Color.Black);
-        }
-    }
-    
-    void Grid()
-    {
-        for (Vector2 V = new Vector2(0, 0); V.X <= Width; V.X += pixel)
-        {
-            Vector2 Pend = new Vector2(V.X, Height);
-            Raylib.DrawLineV(V, Pend, Color.LightGray);
+            for (int i = 0; i < TetroHold.Count; i++)
+            {
+                var tetro = TetroHold[i];
+                switch (tetro.IsActive)
+                {
+                    case true:
+                        switch (tetro.MostRight)
+                        {
+                            case true:
+                                 mostRightX = tetro.Position.X;
+                                break;
+                        }
+                        break;
+                }
+                Raylib.DrawText(mostRightX.ToString(), 100, 0, 60, Color.Black);
+            }
         }
 
-        for (Vector2 v = new Vector2(0, 0); v.Y <= Height; v.Y += pixel)
+        void Grid()
         {
-            Vector2 pend = new Vector2(Width, v.Y);
-            Raylib.DrawLineV(v, pend, Color.LightGray);
+            for (Vector2 V = new Vector2(0, 0); V.X <= Width; V.X += pixel)
+            {
+                Vector2 posEnd = new Vector2(V.X, Height);
+                Raylib.DrawLineV(V, posEnd, Color.LightGray);
+            }
+
+            for (Vector2 v = new Vector2(0, 0); v.Y <= Height; v.Y += pixel)
+            {
+                Vector2 posEnd = new Vector2(Width, v.Y);
+                Raylib.DrawLineV(v, posEnd, Color.LightGray);
+            }
         }
-    }
 
     void Tetrominoes(string tetromino)
     {
@@ -91,9 +136,11 @@ namespace tetris
                 I();
                 break;
             
+            //square
             case "X":
                 X();
                 break;
+            
         }
 
         void L()
@@ -104,14 +151,16 @@ namespace tetris
             bool isVisible3 = true;
             bool isVisible4 = true;
             bool isActive = true;
+            bool mostLeft = false;
+            bool mostRight = false;
             Vector2 pos = new Vector2(0, 0);
             Vector2 pos2 = new Vector2(pos.X, pos.Y + pixel);
             Vector2 pos3 = new Vector2(pos.X, pos2.Y + pixel);
             Vector2 pos4 = new Vector2(pos.X + pixel, pos3.Y);
-            TetroHold.Add(new TetroManager(color, pos, isVisible1,isActive));
-            TetroHold.Add(new TetroManager(color, pos2, isVisible2,isActive));
-            TetroHold.Add(new TetroManager(color, pos3, isVisible3,isActive));
-            TetroHold.Add(new TetroManager(color, pos4, isVisible4,isActive));
+            TetroHold.Add(new TetroManager(color, pos, isVisible1,isActive,mostLeft = true, mostRight));
+            TetroHold.Add(new TetroManager(color, pos2, isVisible2,isActive,mostLeft = true, mostRight));
+            TetroHold.Add(new TetroManager(color, pos3, isVisible3,isActive,mostLeft = true, mostRight));
+            TetroHold.Add(new TetroManager(color, pos4, isVisible4,isActive,mostLeft, mostRight = true));
         }
         
         void I()
@@ -122,14 +171,16 @@ namespace tetris
             bool isVisible3 = true;
             bool isVisible4 = true;
             bool isActive = true;
+            bool mostLeft = true;
+            bool mostRight = true;
             Vector2 pos = new Vector2(0, 0);
             Vector2 pos2 = new Vector2(pos.X, pos.Y + pixel);
             Vector2 pos3 = new Vector2(pos.X, pos2.Y + pixel);
             Vector2 pos4 = new Vector2(pos.X, pos3.Y + pixel);
-            TetroHold.Add(new TetroManager(color, pos, isVisible1,isActive));
-            TetroHold.Add(new TetroManager(color, pos2, isVisible2,isActive));
-            TetroHold.Add(new TetroManager(color, pos3, isVisible3,isActive));
-            TetroHold.Add(new TetroManager(color, pos4, isVisible4,isActive));
+            TetroHold.Add(new TetroManager(color, pos, isVisible1,isActive,mostLeft, mostRight));
+            TetroHold.Add(new TetroManager(color, pos2, isVisible2,isActive,mostLeft, mostRight));
+            TetroHold.Add(new TetroManager(color, pos3, isVisible3,isActive,mostLeft, mostRight));
+            TetroHold.Add(new TetroManager(color, pos4, isVisible4,isActive,mostLeft, mostRight));
         }
 
         void X()
@@ -140,48 +191,68 @@ namespace tetris
             bool isVisible3 = true;
             bool isVisible4 = true;
             bool isActive = true;
+            bool mostLeft = false;
+            bool mostRight = false;
             Vector2 pos = new Vector2(0, 0);
             Vector2 pos2 = new Vector2(pos.X + pixel, pos.Y);
             Vector2 pos3 = new Vector2(pos.X, pos2.Y + pixel);
             Vector2 pos4 = new Vector2(pos.X + pixel, pos3.Y);
-            TetroHold.Add(new TetroManager(color, pos, isVisible1,isActive));
-            TetroHold.Add(new TetroManager(color, pos2, isVisible2,isActive));
-            TetroHold.Add(new TetroManager(color, pos3, isVisible3,isActive));
-            TetroHold.Add(new TetroManager(color, pos4, isVisible4,isActive));
+            TetroHold.Add(new TetroManager(color, pos, isVisible1,isActive,mostLeft, mostRight = true));
+            TetroHold.Add(new TetroManager(color, pos2, isVisible2,isActive,mostLeft = true, mostRight));
+            TetroHold.Add(new TetroManager(color, pos3, isVisible3,isActive,mostLeft, mostRight = true));
+            TetroHold.Add(new TetroManager(color, pos4, isVisible4,isActive,mostLeft = true, mostRight));
         }
+        
+        
     }
 
     public class TetroManager
     {
-        public TetroManager(Color color, Vector2 position, bool isVisible, bool isActive)
+         public TetroManager(Color color, Vector2 position, bool isVisible, bool isActive,bool mostLeft,bool mostRight)
         {
             Color = color;
             Position = position;
             IsVisible = isVisible;
             IsActive = isActive;
+            mostLeft = MostLeft;
+            mostRight = MostRight;
         }
-        
         
         public Color Color { get; }
         public Vector2 Position { get; set; }
         public bool IsVisible { get; set; }
         public bool IsActive { get; set; }
+        public bool MostLeft { get; }
+        public bool MostRight { get; }
     }
-    //problem with implementing a timer 
+    // game logic
     void Update() 
     {
         if (Raylib.IsKeyPressed(KeyboardKey.RightBracket))
         {
-            switch (debug)
+            switch (debugMostLeft)
             {
                 case true:
-                    debug = false;
+                    debugMostLeft = false;
                     break;
                 
                 case false:
-                    debug = true;
+                    debugMostLeft = true;
                     break;
             } 
+        }
+
+        if (Raylib.IsKeyPressed(KeyboardKey.LeftBracket))
+        {
+            switch (debugMostRight)
+            {
+                case true:
+                    debugMostRight = false;
+                    break;
+                case false:
+                    debugMostRight = true;
+                    break;
+            }
         }
         
         for (int i = 0; i < TetroHold.Count; i++)
@@ -206,7 +277,8 @@ namespace tetris
                             {
                                 tetromino.IsActive = false;
                             }
-                            if (tetromino.IsActive)
+
+                            if (tetromino.IsActive == true)
                             {
                                 if (tetromino.Position.Y >= landingPos)
                                 {
@@ -220,15 +292,54 @@ namespace tetris
                             }
                         }
                         
+                        TetroManager TetroMost(string what)
+                        {
+                            what.ToUpper();
+                            for (int i = 0; i < TetroHold.Count; i++)
+                            {
+                                var tetro = TetroHold[i];
+                                switch (tetro.IsActive)
+                                {
+                                    case true:
+                                        switch (what)
+                                        {
+                                            case "LEFT":
+                                                switch (tetro.MostLeft)
+                                                {
+                                                    case true:
+                                                        var mostLeft = TetroHold[i];
+                                                        return mostLeft;
+                                                        break;
+                                                }
+                                                break;
+                                            case  "RIGHT":
+                                                switch (tetro.MostLeft)
+                                                {
+                                                    case true:
+                                                        var mostRight = TetroHold[i];
+                                                        return  mostRight;
+                                                }
+                                                break;
+                                        }
+
+                                        break;
+                                }
+                            }
+                             TetroManager tetroManage = new TetroManager(Color.Red,Vector2.Zero,false,false,false,false);
+                            return tetroManage;
+                        }
+                        
                 //Movement
                 void Move(Object source, ElapsedEventArgs e)
                 {
-                    if (land == false)
+                    switch (land)
                     {
+                        case false:
                         float y = tetro.Position.Y;
-                        y += pixel/speed;
+                        y += pixel / speed;
                         tetro.Position = new Vector2(tetro.Position.X, y);
                         times++;
+                        break;
                     }
                 }
 
@@ -245,7 +356,7 @@ namespace tetris
                     X += pixel;
                     tetro.Position = new Vector2(X, tetro.Position.Y);
                 }
-                
+                        
                 break;
             }
         }
